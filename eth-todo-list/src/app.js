@@ -7,6 +7,7 @@ App = {
     await App.loadAccount()
     await App.loadContract()
     await App.render()
+    web3.eth.defaultAccount = App.account
   },
 
   // https://medium.com/metamask/https-medium-com-metamask-breaking-change-injecting-web3-7722797916a8
@@ -75,7 +76,12 @@ App = {
     // Update loading state
     App.setLoading(false)
   },
-
+  createTask: async () => {
+    App.setLoading(true)
+    const content = $('#newTask').val()
+    await App.todoList.createTask(content)
+    window.location.reload()
+  },
   renderTasks: async () => {
     // Load the total task count from the blockchain
     const taskCount = await App.todoList.taskCount()
@@ -95,7 +101,7 @@ App = {
       $newTaskTemplate.find('input')
                       .prop('name', taskId)
                       .prop('checked', taskCompleted)
-                      .on('click', App.toggleCompleted)
+                      // .on('click', App.toggleCompleted)
 
       // Put the task in the correct list
       if (taskCompleted) {
@@ -106,16 +112,12 @@ App = {
 
       // Show the task
       $newTaskTemplate.show()
+      $newTaskTemplate.find('input')
+      .prop('name', taskId)
+      .prop('checked', taskCompleted)
+      .on('click', App.toggleCompleted)
     }
   },
-
-  createTask: async () => {
-    App.setLoading(true)
-    const content = $('#newTask').val()
-    await App.todoList.createTask(content)
-    window.location.reload()
-  },
-
   toggleCompleted: async (e) => {
     App.setLoading(true)
     const taskId = e.target.name
